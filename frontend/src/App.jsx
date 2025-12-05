@@ -5,6 +5,9 @@ import Login from "./components/Login";
 import Layout from "./components/Layout";
 import Signup from "./components/Signup";
 import Dashboard from "./pages/Dashboard";
+import PendingPage from "./pages/PendingPage";
+import CompletePage from "./pages/CompletePage";
+import Profile from "./components/Profile";
 
 const App = () => {
   const navigate = useNavigate();
@@ -25,7 +28,7 @@ const App = () => {
     const user = {
       email: data.email,
       name: data.name || "User",
-      avatar: ``,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'User')}&background=random`,
     };
     setCurrentUser(user);
     navigate("/", { replace: true });
@@ -73,6 +76,18 @@ const App = () => {
         }
       >
         <Route path="/" element={<Dashboard />} />
+        <Route path="/pending" element={<PendingPage />} />
+        <Route path="/complete" element={<CompletePage />} />
+        <Route
+          path="/profile"
+          element={
+            <Profile
+              user={currentUser}
+              setCurrentUser={setCurrentUser}
+              onLogout={handleLogout}
+            />
+          }
+        />
       </Route>
       <Route
         path="*"
