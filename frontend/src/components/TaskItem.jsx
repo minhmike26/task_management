@@ -51,7 +51,7 @@ const TaskItem = ({
     const newStatus = isCompleted ? "No" : "Yes";
     try {
       await axios.put(
-        `http://localhost:5000/api/task/${task.id}/gp`,
+        `http://localhost:5000/api/task/${task._id}/gp`,
         { completed: newStatus },
         { headers: getAuthHeaders() }
       );
