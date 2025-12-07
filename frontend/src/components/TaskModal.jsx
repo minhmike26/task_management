@@ -71,7 +71,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
         const url = isEdit
           ? `http://localhost:5000/api/task/${taskData.id}/gp`
           : "http://localhost:5000/api/task/gp";
-        const resp = await axios.fetch(url, {
+        const resp = await fetch(url, {
           method: isEdit ? "PUT" : "POST",
           headers: getHeaders(),
           body: JSON.stringify(taskData),
@@ -93,6 +93,8 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
     },
     [taskData, today, getHeaders, onLogout, onSave, onClose]
   );
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-black/20 z-50 flex items-center justify-center p-4">
@@ -208,6 +210,23 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
               ))}
             </div>
           </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-md transition-all duration-200"
+          >
+            {loading ? (
+              "Saving..."
+            ) : taskData.id ? (
+              <>
+                <Save className="w-4 h-4" /> Update Task
+              </>
+            ) : (
+              <>
+                <PlusCircle className="w-4 h-4" /> Create Task
+              </>
+            )}
+          </button>
         </form>
       </div>
     </div>

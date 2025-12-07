@@ -59,7 +59,7 @@ export const baseControlClasses =
 export const priorityStyles = {
   Low: "bg-green-100 text-green-700 border-green-200",
   Medium: "bg-purple-100 text-purple-700 border-purple-200",
-  High: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200",
+  High: "bg-red-100 text-red-700 border-red-200",
 };
 
 // data/defaultTask.js
@@ -173,7 +173,7 @@ export const getPriorityColor = (priority) => {
   const colors = {
     low: "border-green-500 bg-green-50/50 text-green-700",
     medium: "border-purple-500 bg-purple-50/50 text-purple-600",
-    high: "border-fuchsia-800 bg-fuchsia-50/50 text-fuchsia-800",
+    high: "border-red-500 bg-red-50/50 text-red-500",
   };
   return (
     colors[priority?.toLowerCase()] ||
@@ -185,7 +185,7 @@ export const getPriorityBadgeColor = (priority) => {
   const colors = {
     low: "bg-green-100 text-green-900",
     medium: "bg-purple-100 text-purple-900",
-    high: "bg-fuchsia-300 text-fuchsia-900",
+    high: "bg-red-100 text-red-900",
   };
   return colors[priority?.toLowerCase()] || "bg-gray-100 text-gray-700";
 };
@@ -356,11 +356,11 @@ export const MENU_OPTIONS = [
 // CSS class groups for TaskItem
 export const TI_CLASSES = {
   wrapper:
-    "group p-4 sm:p-5 rounded-xl shadow-sm bg-white border-l-4 hover:shadow-md transition-all duration-300 border border-purple-100",
+    "group p-4 sm:p-5 rounded-xl shadow-sm bg-white border-l-4 hover:shadow-md transition-all duration-300 border",
   leftContainer: "flex items-start gap-2 sm:gap-3 flex-1 min-w-0",
   completeBtn:
     "mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-full hover:bg-purple-100 transition-colors duration-300",
-  checkboxIconBase: "w-4 h-4 sm:w-5 sm:h-5",
+  checkboxIconBase: "w-5 h-5 sm:w-7 sm:h-7",
   titleBase: "text-base sm:text-lg font-medium truncate",
   priorityBadge: "text-xs px-2 py-0.5 rounded-full shrink-0",
   description: "text-sm text-gray-500 mt-1 truncate",
@@ -378,11 +378,13 @@ export const TI_CLASSES = {
   createdRow:
     "flex items-center gap-1.5 text-xs text-gray-400 whitespace-nowrap",
 };
-{/*}
+{
+  /*}
 // APP.JSX
 const user = {
   avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
     data.name || "User"
   )}&background=random`,
 };
-*/}
+*/
+}

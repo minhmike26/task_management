@@ -55,6 +55,7 @@ const Layout = ({ onLogout, user }) => {
       : 0;
 
     return {
+      totalCount,
       completedTasks,
       pendingCount,
       completionPercentage,
@@ -182,10 +183,10 @@ const Layout = ({ onLogout, user }) => {
                 {tasks.slice(0, 3).map((task) => (
                   <div
                     key={task._id || task.id}
-                    className="flex itens-center justify-between p-2 sm:p-3 hover:bg-purple-50/50 rounded-lg transition-colors duration-200 border border-transparent hover:border-purple-100"
+                    className="flex items-center justify-between p-2 sm:p-3 hover:bg-purple-50/50 rounded-lg transition-colors duration-200 border border-transparent hover:border-purple-100"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-700 break-words whitespace-normal">
+                      <p className="text-sm font-medium text-gray-700 break-word whitespace-normal">
                         {task.title}
                       </p>
                       <p className="text-xs text-gray-500 mt-0.5">
