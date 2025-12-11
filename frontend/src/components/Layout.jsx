@@ -9,8 +9,15 @@ const Layout = ({ onLogout, user }) => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isAdmin = user?.role === "admin";
 
   const fetchTasks = useCallback(async () => {
+    // Admin không cần fetch tasks của riêng mình
+    if (isAdmin) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -35,7 +42,7 @@ const Layout = ({ onLogout, user }) => {
     } finally {
       setLoading(false);
     }
-  }, [onLogout]);
+  }, [onLogout, isAdmin]);
 
   useEffect(() => {
     fetchTasks();
@@ -109,11 +116,18 @@ const Layout = ({ onLogout, user }) => {
       <Navbar user={user} onLogout={onLogout} />
       <Sidebar user={user} tasks={tasks} />
       <div className="ml-0 xl:ml-64 lg:ml-64 md:ml-16 pt-16 p-3 sm:p-4 md:p-4 transition-all duration-300 ">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-          <div className="xl:col-span-2 space-y-3 sm:space-y-4">
-            <Outlet context={{ tasks, refreshTasks: fetchTasks }} />
+        {isAdmin ? (
+          // Admin layout - full width, no statistics sidebar
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
           </div>
-          <div className="xl:col-span-1 space-y-4 sm:space-y-6">
+        ) : (
+          // User layout - with statistics sidebar
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div className="xl:col-span-2 space-y-3 sm:space-y-4">
+              <Outlet context={{ tasks, refreshTasks: fetchTasks }} />
+            </div>
+            <div className="xl:col-span-1 space-y-4 sm:space-y-6">
             <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-purple-100">
               <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
@@ -221,6 +235,7 @@ const Layout = ({ onLogout, user }) => {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

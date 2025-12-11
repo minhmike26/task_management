@@ -20,7 +20,7 @@ const taskSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user", // Match với userModel (mongoose.model("user", userSchema))
     required: true,
   },
   completed: {

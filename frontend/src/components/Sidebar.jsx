@@ -4,9 +4,10 @@ import {
   PRODUCTIVITY_CARD,
   LINK_CLASSES,
   menuItems,
+  adminMenuItems,
   TIP_CARD,
 } from "../assets/dummy";
-import { Lightbulb, Menu, Sparkles, X } from "lucide-react";
+import { Lightbulb, Menu, Sparkles, X, User, Shield } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = ({user, tasks}) => {
@@ -27,12 +28,17 @@ const Sidebar = ({user, tasks}) => {
     };
   }, [mobileOpen]);
 
+  const isAdmin = user?.role === "admin";
+  // Admin chỉ thấy admin menu, không thấy user menu
+  const itemsToShow = isAdmin ? adminMenuItems : menuItems;
+
   const renderMenuItems = (isMobile = false) => (
     <ul className="space-y-2">
-      {menuItems.map(({ text, path, icon }) => (
+      {itemsToShow.map(({ text, path, icon }) => (
         <li key={text}>
           <NavLink
             to={path}
+            end={path === "/admin" || path === "/"} // Chỉ match exact path cho /admin và /
             className={({ isActive }) =>
               [
                 LINK_CLASSES.base,
@@ -77,18 +83,20 @@ const Sidebar = ({user, tasks}) => {
         </div>
 
         <div className="p-4 space-y-6 overflow-y-auto flex-1">
-          <div className={PRODUCTIVITY_CARD.container}>
-            <div className={PRODUCTIVITY_CARD.header}>
-              <h3 className={PRODUCTIVITY_CARD.label}>Productivity</h3>
-              <span className={PRODUCTIVITY_CARD.badge}>{productivity}%</span>
+          {!isAdmin && (
+            <div className={PRODUCTIVITY_CARD.container}>
+              <div className={PRODUCTIVITY_CARD.header}>
+                <h3 className={PRODUCTIVITY_CARD.label}>Productivity</h3>
+                <span className={PRODUCTIVITY_CARD.badge}>{productivity}%</span>
+              </div>
+              <div className={PRODUCTIVITY_CARD.barBg}>
+                <div
+                  className={PRODUCTIVITY_CARD.barFg}
+                  style={{ width: `${productivity}%` }}
+                />
+              </div>
             </div>
-            <div className={PRODUCTIVITY_CARD.barBg}>
-              <div
-                className={PRODUCTIVITY_CARD.barFg}
-                style={{ width: `${productivity}%` }}
-              />
-            </div>
-          </div>
+          )}
           {renderMenuItems()}
           <div className="mt-auto pt-6 lg:block hidden">
             <div className={TIP_CARD.container}>

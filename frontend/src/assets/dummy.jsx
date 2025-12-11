@@ -15,6 +15,7 @@ import {
   MoreVertical,
   Clock,
   Calendar,
+  Shield,
 } from "lucide-react";
 
 // BACKEND TEST
@@ -113,6 +114,20 @@ export const menuItems = [
     text: "Completed Tasks",
     path: "/complete",
     icon: <CheckCircle2 className="w-5 h-5" />,
+  },
+];
+
+export const adminMenuItems = [
+  {
+    text: "Admin Dashboard",
+    path: "/admin",
+    icon: <Shield className="w-5 h-5" />,
+  },
+  { text: "Users", path: "/admin/users", icon: <User className="w-5 h-5" /> },
+  {
+    text: "Tasks",
+    path: "/admin/tasks",
+    icon: <ListChecks className="w-5 h-5" />,
   },
 ];
 

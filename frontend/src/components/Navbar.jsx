@@ -6,6 +6,9 @@ const Navbar = ({ user = {}, onLogout }) => {
   const menuref = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const isAdmin = user?.role === "admin";
+  // Admin không có UI để truy cập profile, chỉ user thường mới cần
+  const profilePath = "/profile";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,7 +35,7 @@ const Navbar = ({ user = {}, onLogout }) => {
         {/* Logo */}
         <div
           className="flex items-center gap-2 cursor-pointer group"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(isAdmin ? "/admin" : "/")}
         >
           {/* LOGO */}
           <div className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-500 shadow-lg group-hover:shadow-purple-300/50 group-hover:scale-105 transition-all duration-300">
@@ -46,12 +49,14 @@ const Navbar = ({ user = {}, onLogout }) => {
         </div>
         {/* right side */}
         <div className="flex items-center gap-4">
-          <button
-            className="p-2 text-gray-600 hover:text-purple-500 transition-colors duration-300 hover:bg-purple-50 rounded-full"
-            onClick={() => navigate("/profile")}
-          >
-            <UserIcon className="w-6 h-6 text-gray-600" />
-          </button>
+          {!isAdmin && (
+            <button
+              className="p-2 text-gray-600 hover:text-purple-500 transition-colors duration-300 hover:bg-purple-50 rounded-full"
+              onClick={() => navigate(profilePath)}
+            >
+              <UserIcon className="w-6 h-6 text-gray-600" />
+            </button>
+          )}
           {/* Dropdown */}
           <div ref={menuref} className="relative">
             <button
@@ -59,11 +64,15 @@ const Navbar = ({ user = {}, onLogout }) => {
               className="flex items-center gap-2 px-3 py-2 rounded-full cursor-pointer hover:bg-purple-50 transition-colors duration-300 border border-tranperent hover:border-purple-200"
             >
               <div className="relative">
-                {user.avatar ? (
+                {user.avatar && user.avatar.includes("ui-avatars.com") ? (
                   <img
                     src={user.avatar}
                     alt="Avatar"
                     className="w-9 h-9 rounded-full shadow-sm"
+                    onError={(e) => {
+                      // Nếu ảnh lỗi, ẩn img và hiển thị chữ cái đầu
+                      e.target.style.display = "none";
+                    }}
                   />
                 ) : (
                   <div className="w-8 h-8 flex items-center justify-center rounded-full  bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white font-semibold shadow-md">
@@ -87,19 +96,21 @@ const Navbar = ({ user = {}, onLogout }) => {
 
             {menuOpen && (
               <ul className="absolute top-14 right-0 w-56 bg-white rounded-2xl shadow-xl border border-purple-100 z-50 overflow-hidden animate-fadeIn">
-                <li className="p-2">
-                  <button
-                    onClick={() => {
-                      setMenuOpen(false);
-                      navigate("/profile");
-                    }}
-                    className="w-full px-4 py-2.5 text-left hover:bg-purple-50 text-sm text-gray-700 transition-colors flex items-center gap-2 group"
-                    role="menuitem"
-                  >
-                    <SettingsIcon className="w-4 h-4 text-gray-700" />
-                    Profile Settings
-                  </button>
-                </li>
+                {!isAdmin && (
+                  <li className="p-2">
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        navigate(profilePath);
+                      }}
+                      className="w-full px-4 py-2.5 text-left hover:bg-purple-50 text-sm text-gray-700 transition-colors flex items-center gap-2 group"
+                      role="menuitem"
+                    >
+                      <SettingsIcon className="w-4 h-4 text-gray-700" />
+                      Profile Settings
+                    </button>
+                  </li>
+                )}
                 <li className="p-2">
                   <button
                     onClick={handleLogout}

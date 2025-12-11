@@ -38,7 +38,12 @@ export async function registerUser(req, res) {
     res.status(201).json({
       success: true,
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -72,7 +77,12 @@ export async function loginUser(req, res) {
     res.json({
       success: true,
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -83,7 +93,9 @@ export async function loginUser(req, res) {
 //Get a user logic
 export async function getCurrentUser(req, res) {
   try {
-    const user = await User.findById(req.user.id).select("name email");
+    const user = await User.findById(req.user.id).select(
+      "name email googleId role"
+    );
     if (!user) {
       return res
         .status(404)
@@ -105,6 +117,34 @@ export async function updateProfile(req, res) {
       .json({ success: false, message: "All fields are required" });
   }
   try {
+    // Check if user is admin - admin cannot update profile
+    const currentUser = await User.findById(req.user.id).select(
+      "googleId email role"
+    );
+    if (currentUser.role === "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin profile cannot be modified",
+      });
+    }
+    if (currentUser.googleId) {
+      // Google users can only change name, not email
+      if (email !== currentUser.email) {
+        return res.status(400).json({
+          success: false,
+          message: "Google users cannot change their email address",
+        });
+      }
+      // Only update name for Google users
+      const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { name },
+        { new: true, runValidators: true, select: "name email googleId role" }
+      );
+      return res.json({ success: true, user });
+    }
+
+    // Regular users can change both name and email
     const userExists = await User.findOne({ email, _id: { $ne: req.user.id } });
 
     if (userExists) {
@@ -115,7 +155,7 @@ export async function updateProfile(req, res) {
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { name, email },
-      { new: true, runValidators: true, select: "name email" }
+      { new: true, runValidators: true, select: "name email googleId role" }
     );
     res.json({ success: true, user });
   } catch (error) {
@@ -127,6 +167,26 @@ export async function updateProfile(req, res) {
 //Change password logic
 export async function updatePassword(req, res) {
   const { currentPassword, newPassword } = req.body;
+
+  // Check if user is admin - admin cannot change password
+  const user = await User.findById(req.user.id).select(
+    "password googleId role"
+  );
+  if (user.role === "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Admin password cannot be changed",
+    });
+  }
+
+  // Check if user is a Google user (no password)
+  if (user.googleId) {
+    return res.status(400).json({
+      success: false,
+      message: "Google users cannot change password",
+    });
+  }
+
   if (!currentPassword || !newPassword || newPassword.length < 6) {
     return res.status(400).json({
       success: false,
@@ -135,7 +195,6 @@ export async function updatePassword(req, res) {
     });
   }
   try {
-    const user = await User.findById(req.user.id).select("password");
     if (!user) {
       return res
         .status(404)
@@ -153,5 +212,35 @@ export async function updatePassword(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
+// Google OAuth callback handler
+export async function googleCallback(req, res) {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.redirect(
+        `${
+          process.env.FRONTEND_URL || "http://localhost:5173"
+        }/login?error=authentication_failed`
+      );
+    }
+
+    const token = createToken(user._id);
+    // Không gửi avatar từ Google, để frontend tự tạo từ ui-avatars
+    const redirectUrl = `${
+      process.env.FRONTEND_URL || "http://localhost:5173"
+    }/auth/callback?token=${token}&userId=${user._id}&name=${encodeURIComponent(
+      user.name
+    )}&email=${encodeURIComponent(user.email)}`;
+    res.redirect(redirectUrl);
+  } catch (error) {
+    console.error("Google callback error:", error);
+    res.redirect(
+      `${
+        process.env.FRONTEND_URL || "http://localhost:5173"
+      }/login?error=server_error`
+    );
   }
 }
